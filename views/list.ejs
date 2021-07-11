@@ -1,0 +1,52 @@
+<%- include('partials/header'); -%>
+<div class="container">
+  <div class="row">
+    <div class="col-md-3 list-block">
+      <div class="box" style="margin-bottom: 3px ; background:  rgb(206, 165, 247);text-align: center;"><h1>Your Lists</h1></div>
+      <div class="box list-block-item"><h3>Home</h3></div>
+      <div class="box list-block-item"><h3>Work</h3></div>
+      
+    </div>
+    <div class="col-md-8">
+      <% var date = new Date();%>
+      <%var options = {weekday: "long",day: "numeric",month: "long", };%>
+     <% var day = date.toLocaleDateString("en-US", options);%>
+     <div class="box" id="heading" style="margin-bottom:0;"><h1><%= day %></h1></div>
+      <div class="box" id="heading" style="margin-top:0;"><h1><%= todayDay %></h1></div>
+      <div class="box">
+        <% newItems.forEach(function(item){ %>
+        <form action="/delete" method="POST">
+          <div class="item">
+            <input
+              type="checkbox"
+              name="checkbox"
+              onchange="this.form.submit()"
+              value="<%=item._id %>"
+            />
+            <p><%= item.name %></p>
+          </div>
+          <input type="hidden" name="listName" value=<%= todayDay %> ></input>
+        </form>
+    
+        <% }); %>
+    
+        <form action="/list" method="POST" class="item">
+          <input
+            type="text"
+            name="listItem"
+            placeholder="What you want to do today?"
+            autocomplete="off"
+          />
+          <button type="submit" name="list" value="<%= todayDay %>"><em>+</em></button>
+        </form>
+      </div>
+    </div> 
+
+  </div>
+</div>
+
+
+   
+
+   
+    <%- include('partials/footer'); -%>
