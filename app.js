@@ -9,7 +9,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const app = express(); //create an app
 
 app.set("view engine", "ejs"); //use ejs
-app.use(express.static("CSS"));
+app.use(express.static("public"));
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -43,6 +43,7 @@ const userSchema = new mongoose.Schema({
   password: String,
   googleID: String,
   allLists: [listSchema],
+  homeList: [itemsSchema],
 });
 //adding plugins to schema
 userSchema.plugin(passportLocalMongoose);
@@ -88,25 +89,30 @@ var day = date.toLocaleDateString("en-US", options);
 app.get("/", function (req, res) {
   res.render("home");
 });
+
 app.get("/list", function (req, res) {
-  Item.find(function (err, items) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (items.length == 0) {
-        Item.insertMany(defaultItems, function (err) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("items added successfully");
-          }
+  if (req.isAuthenticated()) {
+    User.findById(req.user.id, function (err, foundUser) {
+      if (!err) {
+        const items = foundUser.homeList;
+        if (items.length == 0) {
+          foundUser.homeList.push(item1, item2, item3);
+          foundUser.save(function (err) {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
+        res.render("list", {
+          lists: foundUser.allLists,
+          thisList: foundUser.homeList,
+          listName: "Today",
         });
-        res.redirect("/list");
-      } else {
-        res.render("list", { todayDay: "Today", newItems: items });
       }
-    }
-  });
+    });
+  } else {
+    res.redirect("/login");
+  }
 });
 
 app.post("/list", function (req, res) {
@@ -115,43 +121,83 @@ app.post("/list", function (req, res) {
   let item = new Item({
     name: listItem,
   });
-  if (listName === "Today") {
-    item.save();
-    res.redirect("/list");
-  } else {
-    List.findOne({ name: listName }, function (err, foundList) {
-      if (!err) {
-        foundList.lists.push(item);
-        foundList.save();
-        res.redirect("/" + listName);
+  User.findById(req.user.id, function (err, foundUser) {
+    if (!err) {
+      if (listName === "Today") {
+        foundUser.homeList.push(item);
+        foundUser.save(function (err) {
+          if (!err) {
+            res.redirect("/list");
+          }
+        });
+      } else {
+        foundUser.allLists.forEach(function (list) {
+          if (list.name === listName) {
+            list.lists.push(item);
+            foundUser.save(function (err) {
+              if (!err) {
+                res.redirect("/lists/" + listName);
+              }
+            });
+          }
+        });
       }
-    });
-  }
+    }
+  });
 });
+
 //for deleting items in the home page
 app.post("/delete", function (req, res) {
   const checkedItemID = req.body.checkbox;
   const listName = req.body.listName;
-  if (listName === "Today") {
-    console.log(day);
-    Item.findByIdAndRemove(checkedItemID, function (err) {
-      if (!err) {
-        console.log("deleted");
+  User.findById(req.user.id, function (err, foundUser) {
+    if (!err) {
+      if (listName === "Today") {
+        foundUser.homeList = foundUser.homeList.filter(function (item) {
+          return item.id != checkedItemID;
+        });
+        foundUser.save(function (err) {
+          if (!err) {
+            res.redirect("/list");
+          }
+        });
+      } else {
+        foundUser.allLists.forEach(function (list) {
+          if (list.name === listName) {
+            list.lists = list.lists.filter(function (item) {
+              return item.id != checkedItemID;
+            });
+          }
+        });
+        foundUser.save(function (err) {
+          if (!err) {
+            res.redirect("/lists/" + listName);
+          }
+        });
       }
-    });
-    res.redirect("/list");
-  } else {
-    List.findOneAndUpdate(
-      { name: listName },
-      { $pull: { lists: { _id: checkedItemID } } },
-      function (err) {
-        if (!err) {
-          res.redirect("/" + listName);
-        }
-      }
-    );
-  }
+    }
+  });
 });
+
+//     console.log(day);
+//     Item.findByIdAndRemove(checkedItemID, function (err) {
+//       if (!err) {
+//         console.log("deleted");
+//       }
+//     });
+//     res.redirect("/list");
+//   } else {
+//     List.findOneAndUpdate(
+//       { name: listName },
+//       { $pull: { lists: { _id: checkedItemID } } },
+//       function (err) {
+//         if (!err) {
+//           res.redirect("/" + listName);
+//         }
+//       }
+//     );
+//   }
+// });
 app.post("/register", function (req, res) {
   const password = req.body.password;
   User.register(
@@ -198,34 +244,78 @@ app.get("/register", function (req, res) {
 app.get("/login", function (req, res) {
   res.render("login");
 });
-
+app.post("/createlist", function (req, res) {
+  const newCreatedList = _.capitalize(req.body.createList);
+  const newList = new List({
+    name: newCreatedList,
+  });
+  User.findById(req.user.id, function (err, foundUser) {
+    if (!err) {
+      foundUser.allLists.push(newList);
+      foundUser.save(function (err) {
+        res.redirect("/list");
+      });
+    }
+  });
+});
 //get when custom list is requested
-app.get("/:listType", function (req, res) {
+app.get("/lists/:listType", function (req, res) {
   const requestedList = _.capitalize(req.params.listType);
-  List.findOne({ name: requestedList }, function (err, foundList) {
-    if (err) {
-      console.log(err);
-    } else {
-      if (!foundList) {
-        //show an existing list
-        const list = new List({
+  let found = false;
+  User.findById(req.user.id, function (err, foundUser) {
+    if (!err) {
+      foundUser.allLists.forEach(function (list) {
+        if (list.name === requestedList) {
+          console.log(list);
+          found = true;
+          res.render("list", {
+            lists: foundUser.allLists,
+            thisList: list.lists,
+            listName: list.name,
+          });
+        }
+      });
+      if (found === false) {
+        const newList = new List({
           name: requestedList,
-          lists: defaultItems,
         });
-        list.save();
-        res.redirect("/" + requestedList);
-      } else {
-        //create a new list
-
-        res.render("list", {
-          todayDay: foundList.name,
-          newItems: foundList.lists,
+        foundUser.allLists.push(newList);
+        foundUser.save(function (err) {
+          if (!err) {
+            res.render("list", {
+              lists: foundUser.allLists,
+              thisList: newList.lists,
+              listName: newList.name,
+            });
+          }
         });
       }
     }
   });
 });
 
+// List.findOne({ name: requestedList }, function (err, foundList) {
+//   if (err) {
+//     console.log(err);
+//   } else {
+//     if (!foundList) {
+//       //Create a new list
+//       const list = new List({
+//         name: requestedList,
+//         lists: defaultItems,
+//       });
+//       list.save();
+//       res.redirect("/" + requestedList);
+//     } else {
+//       //create a new list
+
+//       res.render("list", {
+//         todayDay: foundList.name,
+//         newItems: foundList.lists,
+//       });
+//     }
+//   }
+// });
 //specifying the port.
 app.listen(3000, function () {
   console.log("The server has been started at port 3000");

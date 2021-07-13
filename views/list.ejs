@@ -1,10 +1,18 @@
 <%- include('partials/header'); -%>
+
 <div class="container">
   <div class="row">
     <div class="col-md-3 list-block">
       <div class="box" style="margin-bottom: 3px ; background:  rgb(206, 165, 247);text-align: center;"><h1>Your Lists</h1></div>
-      <div class="box list-block-item"><h3>Home</h3></div>
-      <div class="box list-block-item"><h3>Work</h3></div>
+      <div class="box list-block-item" >
+        <a style="color: #fff; "role="button" href="/list"><h3>Today </h3></a>
+      </div>
+     
+     <% lists.forEach(function(list){ %>
+        <div class="box list-block-item" >
+            <a style="color: #fff; "role="button" href="/lists/<%= list.name %>"><h3><%= list.name %> </h3></a>
+        </div>
+     <% })%>
       
     </div>
     <div class="col-md-8">
@@ -12,9 +20,9 @@
       <%var options = {weekday: "long",day: "numeric",month: "long", };%>
      <% var day = date.toLocaleDateString("en-US", options);%>
      <div class="box" id="heading" style="margin-bottom:0;"><h1><%= day %></h1></div>
-      <div class="box" id="heading" style="margin-top:0;"><h1><%= todayDay %></h1></div>
+      <div class="box" id="heading" style="margin-top:0;"><h1><%= listName %></h1></div>
       <div class="box">
-        <% newItems.forEach(function(item){ %>
+        <% thisList.forEach(function(item){ %>
         <form action="/delete" method="POST">
           <div class="item">
             <input
@@ -25,7 +33,7 @@
             />
             <p><%= item.name %></p>
           </div>
-          <input type="hidden" name="listName" value=<%= todayDay %> ></input>
+          <input type="hidden" name="listName" value=<%= listName %> ></input>
         </form>
     
         <% }); %>
@@ -37,7 +45,7 @@
             placeholder="What you want to do today?"
             autocomplete="off"
           />
-          <button type="submit" name="list" value="<%= todayDay %>"><em>+</em></button>
+          <button type="submit" name="list" value="<%= listName %>"><em>+</em></button>
         </form>
       </div>
     </div> 

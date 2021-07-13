@@ -165,6 +165,9 @@ footer {
   background: rgb(206, 165, 247);
   color: #fff;
 }
+.list-block-item a:hover {
+  text-decoration: none;
+}
 @media (max-width: 768px) {
   .alt-text-row {
     flex-direction: column-reverse;

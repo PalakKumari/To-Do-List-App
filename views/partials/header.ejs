@@ -11,8 +11,13 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.15.3/css/all.css"
+      integrity="sha384-SZXxX4whJ79/gErwcOYf+zWLeJdY/qpuqC4cAa9rOGUstPomtqpuNWT9wdPEn2fk"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/CSS/styles.css" />
     <title>To Do</title>
   </head>
   <body>
@@ -21,7 +26,12 @@
       style="background-color: #a683e3"
       ;
     >
-      <a class="navbar-brand" href="/"><h3 style="color: beige;"><i class="fas fa-clipboard-list"></i>To-Do List</h3></a>
+      <a class="navbar-brand" href="/"
+        ><h3 style="color: beige">
+          <i class="fas fa-clipboard-list" style="margin-right: 4px"></i>To-Do
+          List
+        </h3></a
+      >
       <button
         class="navbar-toggler"
         type="button"
@@ -42,16 +52,37 @@
             >
           </li>
           <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
               Create List
             </a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <div style="margin-left: 3px; width: 95%;">
-                <label for="listName">List name here:</label>
-                <input type="text" class="form-control mr-sm-2" "></input>
-                <button type="submit" class="btn btn-sm btn-dark" style="margin-top: 3px;">Create</button>
+              <div style="margin-left: 3px; width: 95%">
+                <form action="/createlist" method="POST">
+                  <label for="listName">List name here:</label>
+                  <input
+                    type="text"
+                    class="form-control mr-sm-2"
+                    name="createList"
+                    autocomplete="off"
+                  />
+                  <button
+                    type="submit"
+                    class="btn btn-sm btn-dark"
+                    style="margin-top: 3px"
+                  >
+                    Create
+                  </button>
+                </form>
               </div>
-                
+
               <!-- <a class="dropdown-item" href="#">Action</a>
               <a class="dropdown-item" href="#">Another action</a>
               <div class="dropdown-divider"></div>
@@ -65,7 +96,7 @@
            <div>
             <a class="btn btn-outline-light btn-md" role="button" href="/login" style="margin-right: 3px;margin-bottom: 4px;"><i class="fas fa-sign-in-alt"></i>Login</a>
            </div>  -->
-           <!-- <a class="btn btn-outline-dark btn-md" href="/register" role="button">Register</a>
+        <!-- <a class="btn btn-outline-dark btn-md" href="/register" role="button">Register</a>
     <a class="btn btn-outline-light btn-md" href="/login" role="button">Login</a> -->
       </div>
     </nav>
