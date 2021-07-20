@@ -212,7 +212,7 @@ app.post("/register", function (req, res) {
           user.name = req.body.name;
           user.save(function (err) {
             if (!err) {
-              console.log(user);
+              // console.log(user);
               //this function will only execute if authentication is successful.
               res.redirect("/list");
             }
@@ -266,7 +266,7 @@ app.get("/lists/:listType", function (req, res) {
     if (!err) {
       foundUser.allLists.forEach(function (list) {
         if (list.name === requestedList) {
-          console.log(list);
+          // console.log(list);
           found = true;
           res.render("list", {
             lists: foundUser.allLists,

@@ -115,6 +115,7 @@ footer {
 /* *************** mystyles*************** */
 .home-page {
   margin-top: 5%;
+  font-family: 'Montserrat', sans-serif;
 }
 .home-image {
   border-radius: 8px;
@@ -141,12 +142,16 @@ footer {
   position: relative;
   top: 0;
   left: 30%;
+  width: 400px;
+  height: 400px;
 }
 .image2 {
   position: absolute;
   top: 10%;
   left: 10%;
   z-index: 10;
+  width: 400px;
+  height: 400px;
 }
 .list-block {
   padding-top: 0;
@@ -180,5 +185,10 @@ footer {
   .image2 {
     width: 170px;
     height: 170px;
+  }
+  .list-block{
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
   }
 }
