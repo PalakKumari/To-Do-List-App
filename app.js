@@ -23,8 +23,10 @@ app.use(passport.initialize());
 //tell app to use passport for ddealing with sessions.
 app.use(passport.session());
 //create mongoose connection
-mongoose.connect("mongodb://localhost:27017/todolistDB", {
+mongoose.connect("mongodb+srv://palak:test123@cluster0.2jt75.mongodb.net/todolistDB", {
   useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true
 });
 //creating schema for out collections
 const itemsSchema = new mongoose.Schema({
