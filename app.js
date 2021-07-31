@@ -6,6 +6,7 @@ const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
 const connectDB = require("./config/db");
+const morgan = require('morgan')
 
 const app = express(); //create an app
 
@@ -19,6 +20,9 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+
+//intialise morgan middleware
+app.use(morgan('tiny'));
 //tell our app to initialize passport
 app.use(passport.initialize());
 //tell app to use passport for ddealing with sessions.
