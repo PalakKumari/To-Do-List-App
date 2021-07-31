@@ -5,6 +5,8 @@ const _ = require("lodash");
 const session = require("express-session");
 const passport = require("passport");
 const passportLocalMongoose = require("passport-local-mongoose");
+const connectDB = require("./config/db");
+const morgan = require('morgan')
 
 const app = express(); //create an app
 
@@ -18,16 +20,21 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+
+//intialise morgan middleware
+app.use(morgan('tiny'));
 //tell our app to initialize passport
 app.use(passport.initialize());
 //tell app to use passport for ddealing with sessions.
 app.use(passport.session());
 //create mongoose connection
-mongoose.connect("mongodb+srv://palak:test123@cluster0.2jt75.mongodb.net/todolistDB", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useCreateIndex: true
-});
+// mongoose.connect("mongodb+srv://palak:test123@cluster0.2jt75.mongodb.net/todolistDB", {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useCreateIndex: true
+// });
+
+connectDB();
 //creating schema for out collections
 const itemsSchema = new mongoose.Schema({
   name: String,
